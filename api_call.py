@@ -2,35 +2,39 @@
 from ConfigParser import SafeConfigParser
 import codecs,urllib2,json,sys
 try:
+    #Validating if the libraries are present Else it recommends to install
     import requests, validators
 except ImportError as error:
         print(error.__class__.__name__ + ": " + error.message + " Please Install " + error.message.split()[3])
         sys.exit()
 def api_call(api_url,guser):
     try:
+        #Gets data from the github user account
         response = requests.get(url = api_url+guser+'/repos').json()
         if len(response) == 0:
-            print 'No Public Repositories for the user', guser
+            print ('No Public Repositories for the user', guser)
         else:
             for i in range(len(response)):
-                print response[i]['full_name'].split(guser,1)[1][1:]
+                print (response[i]['full_name'].split(guser,1)[1][1:])
     except :
         print('Exception occurred retreving data')
+#method to validate if the user is valid
 def validate_user(api_url,guser):
     try:
         return urllib2.urlopen(api_url+guser).code
     except urllib2.HTTPError as err:
         return err.code
+#Method to validate if its a valid url
 def validate_url(api_url):
     return validators.url(api_url)
 
 def main():
     parser = SafeConfigParser()
+    #Reading Api and url from the credentials file
     with codecs.open('credentials.ini', 'r') as cred_file:
         parser.readfp(cred_file)
     api_url = parser.get('Achievement_First', 'api_url')
     guser = parser.get('Achievement_First', 'guser')
-    #Handle Seperately URL and Username
     url_val =validate_url(api_url)
     user_val=validate_user(api_url,guser)
     if url_val != True:
@@ -42,7 +46,7 @@ def main():
     elif (validate_url(api_url)) and (validate_user(api_url,guser) == 200):
         api_call(api_url,guser)
     else:
-        print 'Please verify GitHub User and API'
+        print('Please verify GitHub User and API')
         sys.exit()
 
 if __name__ == '__main__':
