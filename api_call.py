@@ -5,7 +5,8 @@ try:
     import requests, validators
 except ImportError as error:
         print(error.__class__.__name__ + ": " + error.message + " Please Install " + error.message.split()[3])
-def main(api_url,guser):
+        sys.exit()
+def api_call(api_url,guser):
     try:
         response = requests.get(url = api_url+guser+'/repos').json()
         if len(response) == 0:
@@ -22,7 +23,8 @@ def validate_user(api_url,guser):
         return err.code
 def validate_url(api_url):
     return validators.url(api_url)
-if __name__ == '__main__':
+
+def main():
     parser = SafeConfigParser()
     with codecs.open('credentials.ini', 'r') as cred_file:
         parser.readfp(cred_file)
@@ -34,11 +36,14 @@ if __name__ == '__main__':
     if url_val != True:
         print('API URL is not valid')
         sys.exit()
-    elif  user_val != 200:
+    elif user_val != 200:
          print('Unable to validate the user because of',validate_user(api_url,guser))
          sys.exit()
     elif (validate_url(api_url)) and (validate_user(api_url,guser) == 200):
-        main(api_url,guser)
+        api_call(api_url,guser)
     else:
         print 'Please verify GitHub User and API'
         sys.exit()
+
+if __name__ == '__main__':
+    main()
